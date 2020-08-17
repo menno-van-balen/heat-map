@@ -20,6 +20,9 @@ const colors = [
 // fetch data
 d3.json(url)
   .then(function (data) {
+    data.monthlyVariance.forEach(function (val) {
+      val.month -= 1;
+    });
     // inject main container
     const main = d3
       .select("body")
@@ -76,10 +79,20 @@ d3.json(url)
 
     // define y-scale
     const yScale = d3
-      .scaleTime()
+      .scaleBand()
       .domain([
-        d3.min(dataSet, (d) => new Date(0, d.month - 1)),
-        d3.max(dataSet, (d) => new Date(0, d.month - 1)),
+        new Date(0, 0),
+        new Date(0, 1),
+        new Date(0, 2),
+        new Date(0, 3),
+        new Date(0, 4),
+        new Date(0, 5),
+        new Date(0, 6),
+        new Date(0, 7),
+        new Date(0, 8),
+        new Date(0, 9),
+        new Date(0, 10),
+        new Date(0, 11),
       ])
       .range([h - padding, padding]);
 
