@@ -20,8 +20,6 @@ const colors = [
 // fetch data
 d3.json(url)
   .then(function (data) {
-    // console.log(data);
-
     // inject main container
     const main = d3
       .select("body")
@@ -46,6 +44,62 @@ d3.json(url)
 
     // inject chart-container
     const chartcontainer = main.append("div").attr("class", "chart-container");
+
+    // define div for tooltip
+    const tooltip = d3
+      .select("body")
+      .append("div")
+      .attr("id", "tooltip")
+      .style("opacity", 0);
+
+    // define canvas
+    const w = 1000;
+    const h = 600;
+    const padding = 65;
+
+    const svg = d3
+      .select(".chart-container")
+      .append("svg")
+      .attr("height", h)
+      .attr("width", w);
+
+    const dataSet = data.monthlyVariance;
+
+    // define x-scale
+    const xScale = d3
+      .scaleTime()
+      .domain([
+        d3.min(dataSet, (d) => new Date(d.year)),
+        d3.max(dataSet, (d) => new Date(d.year)),
+      ])
+      .range([padding, w - padding]);
+
+    // define y-scale
+    const yScale = d3
+      .scaleTime()
+      .domain([
+        d3.min(dataSet, (d) => new Date(0, d.month - 1)),
+        d3.max(dataSet, (d) => new Date(0, d.month - 1)),
+      ])
+      .range([h - padding, padding]);
+
+    // define the y and x axis
+    const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
+
+    const yAxis = d3.axisLeft(yScale).tickFormat(d3.timeFormat("%B"));
+
+    // draw y and x axis
+    svg
+      .append("g")
+      .attr("transform", "translate(0," + (h - padding) + ")")
+      .attr("id", "x-axis")
+      .call(xAxis.ticks(25));
+
+    svg
+      .append("g")
+      .attr("transform", "translate(" + padding + ",0)")
+      .attr("id", "y-axis")
+      .call(yAxis);
   })
   .catch(function (error) {
     console.log("Error, unable to fetch data!");
