@@ -4,17 +4,17 @@ const url =
 
 // 11 colors for heat map index 5 is base color lower index is warmer higher colder, range: +/- 5 degrees
 const colors = [
-  "#9e0142",
-  "#d53e4f",
+  "#a50026",
+  "#d73027",
   "#f46d43",
   "#fdae61",
-  "#fee08b",
+  "#fee090",
   "#ffffbf",
-  "#e6f598",
-  "#abdda4",
-  "#66c2a5",
-  "#3288bd",
-  "#5e4fa2",
+  "#e0f3f8",
+  "#abd9e9",
+  "#74add1",
+  "#4575b4",
+  "#313695",
 ];
 
 // canvas size
@@ -52,6 +52,7 @@ d3.json(url)
       .append("p")
       .attr("id", "description")
       .style("background-color", colors[5])
+      .style("opacity", 0.7)
       .text(
         `Mean temperature over the years ${dataSet[0].year} - ${
           dataSet[dataSet.length - 1].year
