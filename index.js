@@ -2,7 +2,7 @@
 const url =
   "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json";
 
-// 11 colors for heat map index 4 is base color lower index is warmer higher colder, range: +/- 5 degrees
+// 11 colors for heat map index 5 is base color lower index is warmer higher colder, range: +/- 5 degrees
 const colors = [
   "#9e0142",
   "#d53e4f",
@@ -20,9 +20,15 @@ const colors = [
 // fetch data
 d3.json(url)
   .then(function (data) {
+    // set month value to correct value
     data.monthlyVariance.forEach(function (val) {
       val.month -= 1;
     });
+
+    // transform data to useable array for use d3.min/max
+    const baseTemperature = data.baseTemperature;
+    const dataSet = data.monthlyVariance;
+
     // inject main container
     const main = d3
       .select("body")
@@ -35,14 +41,15 @@ d3.json(url)
     heading
       .append("h1")
       .attr("id", "title")
-      .text("Monthly Global Land-Surface Temperature");
+      .text("Monthly Global Land-Surface Deviation from Mean Temperature");
     heading
       .append("p")
       .attr("id", "description")
+      .style("background-color", colors[5])
       .text(
-        `Average temperature over the years ${data.monthlyVariance[0].year} - ${
-          data.monthlyVariance[data.monthlyVariance.length - 1].year
-        } is ${data.baseTemperature}°C`
+        `Mean temperature over the years ${dataSet[0].year} - ${
+          dataSet[dataSet.length - 1].year
+        } is ${baseTemperature}°C`
       );
 
     // inject chart-container
@@ -56,7 +63,7 @@ d3.json(url)
       .style("opacity", 0);
 
     // define canvas
-    const w = 1100;
+    const w = 1200;
     const h = 600;
     const padding = 65;
 
@@ -65,10 +72,6 @@ d3.json(url)
       .append("svg")
       .attr("height", h)
       .attr("width", w);
-
-    // transform data to useable array for use d3.min/max
-    const dataSet = data.monthlyVariance;
-    const baseTemperature = data.baseTemperature;
 
     // define x-scale
     const xScale = d3
@@ -117,6 +120,8 @@ d3.json(url)
       .call(yAxis);
 
     // draw bars and tooltip
+    const barwidth = (w - 2 * padding) / Math.ceil(dataSet.length / 12);
+
     svg
       .selectAll("rect")
       .data(dataSet)
@@ -126,8 +131,50 @@ d3.json(url)
       .attr("data-month", (d) => d.month)
       .attr("data-year", (d) => d.year)
       .attr("data-temp", (d) => baseTemperature + d.variance)
+      .attr("variance", (d) => d.variance)
       .attr("x", (d) => xScale(new Date(d.year)))
-      .attr("y", (d) => yScale(new Date(0, d.month)));
+      .attr("y", (d) => yScale(new Date(0, d.month)))
+      .attr("width", barwidth)
+      .attr("height", (h - 2 * padding) / 12)
+      .style("fill", (d) => {
+        if (d.variance < -4.5) {
+          return colors[10];
+        }
+        if (-4.5 <= d.variance && d.variance < -3.5) {
+          return colors[9];
+        }
+        if (-3.5 <= d.variance && d.variance < -2.5) {
+          return colors[8];
+        }
+        if (-2.5 <= d.variance && d.variance < -1.5) {
+          return colors[7];
+        }
+        if (-1.5 <= d.variance && d.variance < -0.5) {
+          return colors[6];
+        }
+        if (-0.5 <= d.variance && d.variance < 0.5) {
+          return colors[5]; // base temperature
+        }
+        if (0.5 <= d.variance && d.variance < 1.5) {
+          return colors[4];
+        }
+        if (1.5 <= d.variance && d.variance < 2.5) {
+          // console.log(d.variance);
+          return colors[3];
+        }
+        if (2.5 <= d.variance && d.variance < 3.5) {
+          // console.log(d.variance);
+          return colors[2];
+        }
+        if (3.5 <= d.variance && d.variance < 4.5) {
+          // console.log(d.variance);
+          return colors[1];
+        }
+        if (4.5 <= d.variance) {
+          // console.log(d.variance);
+          return colors[0];
+        }
+      });
   })
   .catch(function (error) {
     console.log("Error, unable to fetch data!");
