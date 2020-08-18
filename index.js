@@ -56,7 +56,7 @@ d3.json(url)
       .style("opacity", 0);
 
     // define canvas
-    const w = 1000;
+    const w = 1100;
     const h = 600;
     const padding = 65;
 
@@ -66,7 +66,9 @@ d3.json(url)
       .attr("height", h)
       .attr("width", w);
 
+    // transform data to useable array for use d3.min/max
     const dataSet = data.monthlyVariance;
+    const baseTemperature = data.baseTemperature;
 
     // define x-scale
     const xScale = d3
@@ -96,12 +98,12 @@ d3.json(url)
       ])
       .range([h - padding, padding]);
 
-    // define the y and x axis
+    // define the x and y axis
     const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
 
     const yAxis = d3.axisLeft(yScale).tickFormat(d3.timeFormat("%B"));
 
-    // draw y and x axis
+    // draw x and y axis
     svg
       .append("g")
       .attr("transform", "translate(0," + (h - padding) + ")")
@@ -113,6 +115,19 @@ d3.json(url)
       .attr("transform", "translate(" + padding + ",0)")
       .attr("id", "y-axis")
       .call(yAxis);
+
+    // draw bars and tooltip
+    svg
+      .selectAll("rect")
+      .data(dataSet)
+      .enter()
+      .append("rect")
+      .attr("class", "cell")
+      .attr("data-month", (d) => d.month)
+      .attr("data-year", (d) => d.year)
+      .attr("data-temp", (d) => baseTemperature + d.variance)
+      .attr("x", (d) => xScale(new Date(d.year)))
+      .attr("y", (d) => yScale(new Date(0, d.month)));
   })
   .catch(function (error) {
     console.log("Error, unable to fetch data!");
