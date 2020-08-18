@@ -9,8 +9,10 @@ svg {
   background-color: rgb(199, 199, 199);
 }
 
-.bar:hover {
-  fill: rgb(127, 208, 255);
+.cell:hover {
+  cursor: pointer;
+  stroke-width: 2px;
+  stroke: black;
 }
 
 #tooltip {
@@ -18,7 +20,7 @@ svg {
   text-align: center;
   padding: 5px;
   font: 14px sans-serif;
-  background: rgb(255, 241, 181);
+  background: rgb(219, 219, 219);
   border: 0px;
   border-radius: 8px;
 }

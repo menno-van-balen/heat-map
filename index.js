@@ -178,6 +178,28 @@ d3.json(url)
           // console.log(d.variance);
           return colors[0];
         }
+      })
+      .on("mouseover", function (d) {
+        const formatMonth = d3.timeFormat("%B");
+        const formatTemp = d3.format(".2f");
+        tooltip.attr("data-year", d3.select(this).attr("data-year"));
+        tooltip.transition().duration(200).style("opacity", 0.8);
+        tooltip
+          .html(
+            d3.select(this).attr("data-year") +
+              " - " +
+              formatMonth(new Date(d3.select(this).attr("data-month"))) +
+              " <br/> temperature: " +
+              formatTemp(d3.select(this).attr("data-temp")) +
+              "°C<br/> deviation: " +
+              d3.select(this).attr("variance") +
+              "°C"
+          )
+          .style("left", d3.event.pageX + "px")
+          .style("top", d3.event.pageY - 75 + "px");
+      })
+      .on("mouseout", function (d) {
+        tooltip.transition().duration(500).style("opacity", 0);
       });
   })
   .catch(function (error) {
