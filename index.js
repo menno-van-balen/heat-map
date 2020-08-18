@@ -17,6 +17,11 @@ const colors = [
   "#5e4fa2",
 ];
 
+// canvas size
+const w = 1200;
+const h = 600;
+const padding = 65;
+
 // fetch data
 d3.json(url)
   .then(function (data) {
@@ -41,7 +46,8 @@ d3.json(url)
     heading
       .append("h1")
       .attr("id", "title")
-      .text("Monthly Global Land-Surface Deviation from Mean Temperature");
+      .text("Monthly Global Land-Surface Deviation from Mean Temperature")
+      .style("text-align", "center");
     heading
       .append("p")
       .attr("id", "description")
@@ -50,7 +56,8 @@ d3.json(url)
         `Mean temperature over the years ${dataSet[0].year} - ${
           dataSet[dataSet.length - 1].year
         } is ${baseTemperature}°C`
-      );
+      )
+      .style("text-align", "center");
 
     // inject chart-container
     const chartcontainer = main.append("div").attr("class", "chart-container");
@@ -63,10 +70,6 @@ d3.json(url)
       .style("opacity", 0);
 
     // define canvas
-    const w = 1200;
-    const h = 600;
-    const padding = 65;
-
     const svg = d3
       .select(".chart-container")
       .append("svg")
