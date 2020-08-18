@@ -52,7 +52,7 @@ d3.json(url)
       .append("p")
       .attr("id", "description")
       .style("background-color", colors[5])
-      .style("opacity", 0.7)
+      .style("opacity", 0.8)
       .text(
         `Mean temperature over the years ${dataSet[0].year} - ${
           dataSet[dataSet.length - 1].year
@@ -201,6 +201,59 @@ d3.json(url)
       .on("mouseout", function (d) {
         tooltip.transition().duration(500).style("opacity", 0);
       });
+
+    // legend
+    const legend = d3.select("body").append("div").attr("id", "legend");
+
+    // define canvas for legend
+    const lh = 50;
+    const lw = 400;
+    const lpadding = 8;
+
+    const svgLegend = d3
+      .select("#legend")
+      .append("svg")
+      .attr("height", lh)
+      .attr("width", lw);
+
+    const tempDev = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
+
+    const lxScale = d3
+      .scaleLinear()
+      .domain([-5, 5])
+      .range([lpadding, lw - lpadding]);
+    const linearScale = d3
+      .scaleLinear()
+      .domain(tempDev)
+      .range(colors.reverse());
+
+    const lxAxis = d3.axisBottom(lxScale);
+
+    svgLegend
+      .append("g")
+      .attr("id", "lxAxis")
+      .attr("transform", "translate(0, " + (lpadding + 3) + ")")
+      .call(lxAxis);
+
+    svgLegend
+      .selectAll("circle")
+      .data(tempDev)
+      .enter()
+      .append("circle")
+      .attr("r", 6)
+      .attr("cy", lpadding)
+      .attr("cx", function (d) {
+        return lxScale(d);
+      })
+      .style("fill", function (d) {
+        return linearScale(d);
+      });
+
+    svgLegend
+      .append("text")
+      .text("deviation in °C")
+      .style("text-anchor", "middle")
+      .attr("transform", "translate(" + lw / 2 + ", " + (lh - lpadding) + ")");
   })
   .catch(function (error) {
     console.log("Error, unable to fetch data!");
