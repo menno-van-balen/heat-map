@@ -15,7 +15,7 @@ const colors = [
   "#74add1",
   "#4575b4",
   "#313695",
-];
+].reverse();
 
 // canvas size
 const w = 1200;
@@ -123,85 +123,6 @@ d3.json(url)
       .attr("id", "y-axis")
       .call(yAxis);
 
-    // draw bars and tooltip
-    const barwidth = (w - 2 * padding) / Math.ceil(dataSet.length / 12);
-
-    svg
-      .selectAll("rect")
-      .data(dataSet)
-      .enter()
-      .append("rect")
-      .attr("class", "cell")
-      .attr("data-month", (d) => d.month)
-      .attr("data-year", (d) => d.year)
-      .attr("data-temp", (d) => baseTemperature + d.variance)
-      .attr("variance", (d) => d.variance)
-      .attr("x", (d) => xScale(new Date(d.year)))
-      .attr("y", (d) => yScale(new Date(0, d.month)))
-      .attr("width", barwidth)
-      .attr("height", (h - 2 * padding) / 12)
-      .style("fill", (d) => {
-        if (d.variance < -4.5) {
-          return colors[10];
-        }
-        if (-4.5 <= d.variance && d.variance < -3.5) {
-          return colors[9];
-        }
-        if (-3.5 <= d.variance && d.variance < -2.5) {
-          return colors[8];
-        }
-        if (-2.5 <= d.variance && d.variance < -1.5) {
-          return colors[7];
-        }
-        if (-1.5 <= d.variance && d.variance < -0.5) {
-          return colors[6];
-        }
-        if (-0.5 <= d.variance && d.variance < 0.5) {
-          return colors[5]; // base temperature
-        }
-        if (0.5 <= d.variance && d.variance < 1.5) {
-          return colors[4];
-        }
-        if (1.5 <= d.variance && d.variance < 2.5) {
-          // console.log(d.variance);
-          return colors[3];
-        }
-        if (2.5 <= d.variance && d.variance < 3.5) {
-          // console.log(d.variance);
-          return colors[2];
-        }
-        if (3.5 <= d.variance && d.variance < 4.5) {
-          // console.log(d.variance);
-          return colors[1];
-        }
-        if (4.5 <= d.variance) {
-          // console.log(d.variance);
-          return colors[0];
-        }
-      })
-      .on("mouseover", function (d) {
-        const formatMonth = d3.timeFormat("%B");
-        const formatTemp = d3.format(".2f");
-        tooltip.attr("data-year", d3.select(this).attr("data-year"));
-        tooltip.transition().duration(200).style("opacity", 0.8);
-        tooltip
-          .html(
-            d3.select(this).attr("data-year") +
-              " - " +
-              formatMonth(new Date(d3.select(this).attr("data-month"))) +
-              " <br/> temperature: " +
-              formatTemp(d3.select(this).attr("data-temp")) +
-              "°C<br/> deviation: " +
-              d3.select(this).attr("variance") +
-              "°C"
-          )
-          .style("left", d3.event.pageX + "px")
-          .style("top", d3.event.pageY - 75 + "px");
-      })
-      .on("mouseout", function (d) {
-        tooltip.transition().duration(500).style("opacity", 0);
-      });
-
     // legend
     const legend = d3.select("body").append("div").attr("id", "legend");
 
@@ -222,10 +143,7 @@ d3.json(url)
       .scaleLinear()
       .domain([-5, 5])
       .range([lpadding, lw - lpadding]);
-    const linearScale = d3
-      .scaleLinear()
-      .domain(tempDev)
-      .range(colors.reverse());
+    const linearScale = d3.scaleLinear().domain(tempDev).range(colors);
 
     const lxAxis = d3.axisBottom(lxScale);
 
@@ -254,6 +172,88 @@ d3.json(url)
       .text("deviation in °C")
       .style("text-anchor", "middle")
       .attr("transform", "translate(" + lw / 2 + ", " + (lh - lpadding) + ")");
+
+    // draw bars and tooltip
+    const barwidth = (w - 2 * padding) / Math.ceil(dataSet.length / 12);
+
+    svg
+      .selectAll("rect")
+      .data(dataSet)
+      .enter()
+      .append("rect")
+      .attr("class", "cell")
+      .attr("data-month", (d) => d.month)
+      .attr("data-year", (d) => d.year)
+      .attr("data-temp", (d) => baseTemperature + d.variance)
+      .attr("variance", (d) => d.variance)
+      .attr("x", (d) => xScale(new Date(d.year)))
+      .attr("y", (d) => yScale(new Date(0, d.month)))
+      .attr("width", barwidth)
+      .attr("height", (h - 2 * padding) / 12)
+      .style("fill", function (d) {
+        return linearScale(d.variance);
+      })
+      // .style("fill", (d) => {
+      //   if (d.variance < -4.5) {
+      //     return colors[0];
+      //   }
+      //   if (-4.5 <= d.variance && d.variance < -3.5) {
+      //     return colors[1];
+      //   }
+      //   if (-3.5 <= d.variance && d.variance < -2.5) {
+      //     return colors[2];
+      //   }
+      //   if (-2.5 <= d.variance && d.variance < -1.5) {
+      //     return colors[3];
+      //   }
+      //   if (-1.5 <= d.variance && d.variance < -0.5) {
+      //     return colors[4];
+      //   }
+      //   if (-0.5 <= d.variance && d.variance < 0.5) {
+      //     return colors[5]; // base temperature
+      //   }
+      //   if (0.5 <= d.variance && d.variance < 1.5) {
+      //     return colors[6];
+      //   }
+      //   if (1.5 <= d.variance && d.variance < 2.5) {
+      //     // console.log(d.variance);
+      //     return colors[7];
+      //   }
+      //   if (2.5 <= d.variance && d.variance < 3.5) {
+      //     // console.log(d.variance);
+      //     return colors[8];
+      //   }
+      //   if (3.5 <= d.variance && d.variance < 4.5) {
+      //     // console.log(d.variance);
+      //     return colors[9];
+      //   }
+      //   if (4.5 <= d.variance) {
+      //     // console.log(d.variance);
+      //     return colors[10];
+      //   }
+      // })
+      .on("mouseover", function (d) {
+        const formatMonth = d3.timeFormat("%B");
+        const formatTemp = d3.format(".2f");
+        tooltip.attr("data-year", d3.select(this).attr("data-year"));
+        tooltip.transition().duration(200).style("opacity", 0.8);
+        tooltip
+          .html(
+            d3.select(this).attr("data-year") +
+              " - " +
+              formatMonth(new Date(d3.select(this).attr("data-month"))) +
+              " <br/> temperature: " +
+              formatTemp(d3.select(this).attr("data-temp")) +
+              "°C<br/> deviation: " +
+              d3.select(this).attr("variance") +
+              "°C"
+          )
+          .style("left", d3.event.pageX + "px")
+          .style("top", d3.event.pageY - 75 + "px");
+      })
+      .on("mouseout", function (d) {
+        tooltip.transition().duration(500).style("opacity", 0);
+      });
   })
   .catch(function (error) {
     console.log("Error, unable to fetch data!");
