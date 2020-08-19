@@ -2,7 +2,7 @@
 const url =
   "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json";
 
-// 11 colors for heat map index 5 is base color lower index is warmer higher colder, range: +/- 5 degrees
+// 11 colors for heat map index 5 is base color lower index is colder higher warmer, range: +/- 5 degrees
 const colors = [
   "#a50026",
   "#d73027",
@@ -137,14 +137,19 @@ d3.json(url)
       .attr("height", lh)
       .attr("width", lw);
 
+    // temperture range
     const tempDev = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
 
+    // define legen x scale and axis
     const lxScale = d3
       .scaleLinear()
       .domain([-5, 5])
       .range([lpadding, lw - lpadding]);
-    const linearScale = d3.scaleLinear().domain(tempDev).range(colors);
 
+    // define color scale
+    const colorScale = d3.scaleLinear().domain(tempDev).range(colors);
+
+    // create legend x axis
     const lxAxis = d3.axisBottom(lxScale);
 
     svgLegend
@@ -164,16 +169,17 @@ d3.json(url)
         return lxScale(d);
       })
       .style("fill", function (d) {
-        return linearScale(d);
+        return colorScale(d);
       });
 
+    // text on axis
     svgLegend
       .append("text")
       .text("deviation in °C")
       .style("text-anchor", "middle")
       .attr("transform", "translate(" + lw / 2 + ", " + (lh - lpadding) + ")");
 
-    // draw bars and tooltip
+    // draw bars and tooltip in chart use colorScale for fil
     const barwidth = (w - 2 * padding) / Math.ceil(dataSet.length / 12);
 
     svg
@@ -191,7 +197,7 @@ d3.json(url)
       .attr("width", barwidth)
       .attr("height", (h - 2 * padding) / 12)
       .style("fill", function (d) {
-        return linearScale(d.variance);
+        return colorScale(d.variance);
       })
       // .style("fill", (d) => {
       //   if (d.variance < -4.5) {
