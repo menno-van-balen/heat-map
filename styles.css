@@ -24,3 +24,17 @@ svg {
   border: 0px;
   border-radius: 8px;
 }
+
+.credits {
+  letter-spacing: 3px;
+}
+
+a {
+  color: aliceblue;
+  text-decoration: none;
+}
+
+a:hover {
+  font-weight: bolder;
+  cursor: pointer;
+}

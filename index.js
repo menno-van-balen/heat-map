@@ -174,7 +174,7 @@ d3.json(url)
       });
 
     // legend
-    d3.select("body").append("div").attr("id", "legend");
+    main.append("div").attr("id", "legend");
 
     // define canvas for legend
     const lheight = 60;
