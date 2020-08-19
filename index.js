@@ -177,41 +177,43 @@ d3.json(url)
     d3.select("body").append("div").attr("id", "legend");
 
     // define canvas for legend
-    const lh = 50;
-    const lw = 400;
+    const lheight = 60;
+    const lwidth = 400;
     const lpadding = 8;
 
     const svgLegend = d3
       .select("#legend")
       .append("svg")
-      .attr("height", lh)
-      .attr("width", lw);
+      .attr("height", lheight)
+      .attr("width", lwidth);
 
     // define legend x scale and axis
     const lxScale = d3
-      .scaleLinear()
-      .domain([-5, 5])
-      .range([lpadding, lw - lpadding]);
+      .scaleBand()
+      .domain(tempDev)
+      .range([lpadding, lwidth - lpadding]);
 
     // inject legend x axis
+    const lRectWidth = (lwidth - 2 * lpadding) / tempDev.length;
     const lxAxis = d3.axisBottom(lxScale);
 
     svgLegend
       .append("g")
       .attr("id", "lxAxis")
-      .attr("transform", "translate(0, " + (lpadding + 4) + ")")
+      .attr("transform", "translate(0, " + 2 * lpadding + ")")
       .call(lxAxis);
 
     svgLegend
-      .selectAll("circle")
+      .selectAll("rect")
       .data(tempDev)
       .enter()
-      .append("circle")
-      .attr("r", 6)
-      .attr("cy", lpadding)
-      .attr("cx", function (d) {
+      .append("rect")
+      .attr("y", lpadding)
+      .attr("x", function (d) {
         return lxScale(d);
       })
+      .attr("height", lpadding)
+      .attr("width", lRectWidth)
       .style("fill", function (d) {
         return colorScale(d);
       });
@@ -221,7 +223,10 @@ d3.json(url)
       .append("text")
       .text("deviation in °C")
       .style("text-anchor", "middle")
-      .attr("transform", "translate(" + lw / 2 + ", " + (lh - lpadding) + ")");
+      .attr(
+        "transform",
+        "translate(" + lwidth / 2 + ", " + (lheight - lpadding) + ")"
+      );
   })
   .catch(function (error) {
     console.log("Error, unable to fetch data!");
