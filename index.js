@@ -227,6 +227,14 @@ d3.json(url)
         "transform",
         "translate(" + lwidth / 2 + ", " + (lheight - lpadding) + ")"
       );
+
+    //  credits
+    d3.select("body")
+      .append("p")
+      .attr("class", "credits")
+      .html(
+        "Coded and Designed by <a href='https://github.com/menno-van-balen' target='_blank'>Menno</a>"
+      );
   })
   .catch(function (error) {
     console.log("Error, unable to fetch data!");
